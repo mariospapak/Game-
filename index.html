@@ -1,79 +1,90 @@
-html lang="el">
+<!DOCTYPE html>
+<html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WW2: Total War</title>
+    <title>WW2: Tactical Front</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial Black', Gadget, sans-serif; touch-action: none; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; touch-action: none; color: white; }
         
-        /* ΑΡΧΙΚΟ ΜΕΝΟΥ */
+        /* ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΠΕΡΙΣΤΡΟΦΗΣ */
+        #rotate-notice {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: none;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+
+        @media screen and (orientation: portrait) {
+            #rotate-notice { display: flex; }
+        }
+
+        /* START SCREEN */
         #start-screen {
             position: absolute; width: 100%; height: 100%;
-            /* ΦΟΝΤΟ ΜΕ ΕΙΚΟΝΑ ΜΑΧΗΣ */
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                        url('https://wallpaperaccess.com/full/1152744.jpg');
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://images.wallpapersden.com/image/download/world-of-tanks-battle-art_a2puZmyUmZqaraWkpJRmbmdlrWZlbWU.jpg');
             background-size: cover; background-position: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 200; color: white; text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200;
         }
-        #start-screen h1 { font-size: 4rem; margin-bottom: 30px; text-shadow: 5px 5px #000; color: #f1c40f; border-bottom: 5px solid #8b0000; }
-        
         .play-btn { 
-            padding: 25px 80px; font-size: 2rem; background: #8b0000; color: white; 
-            border: 3px solid #fff; cursor: pointer; border-radius: 10px; font-weight: bold;
-            text-transform: uppercase; transition: 0.3s;
+            padding: 15px 60px; font-size: 2.5rem; background: #8b0000; color: white; 
+            border: 4px solid #f1c40f; cursor: pointer; font-weight: bold; border-radius: 50px;
         }
-        .play-btn:hover { background: #ff0000; transform: scale(1.1); box-shadow: 0 0 20px #ff0000; }
 
-        /* LOADOUT MENU */
-        #loadout-menu { 
-            position: absolute; width: 100%; height: 100%; background: rgba(10,10,10,0.95); 
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 150; color: white;
+        /* JOYSTICK */
+        #joy-base {
+            position: absolute; bottom: 30px; left: 30px; width: 130px; height: 130px;
+            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%; z-index: 100; display: none; touch-action: none;
         }
-        .loadout-card { 
-            background: #1a1a1a; padding: 30px; margin: 15px; border: 2px solid #444; 
-            width: 320px; cursor: pointer; transition: 0.3s; text-align: center;
+        #joy-stick {
+            position: absolute; top: 35px; left: 35px; width: 60px; height: 60px;
+            background: rgba(255,255,255,0.4); border-radius: 50%; touch-action: none;
         }
-        .loadout-card:hover { border-color: #f1c40f; background: #222; }
 
-        /* HUD */
-        #ui { position: absolute; top: 20px; left: 20px; color: #fff; z-index: 10; display: none; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 5px; font-size: 1.2rem; }
-        #mobile-controls { position: absolute; bottom: 30px; left: 20px; display: none; grid-template-columns: repeat(3, 70px); gap: 10px; z-index: 20; }
-        .m-btn { width: 70px; height: 70px; background: rgba(255,255,255,0.2); color: white; display: flex; align-items: center; justify-content: center; border-radius: 15px; font-weight: bold; font-size: 1.5rem; }
-        #attack-btn { position: absolute; bottom: 40px; right: 40px; width: 110px; height: 110px; background: rgba(255,0,0,0.6); border: 4px solid #fff; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 20; color: white; font-weight: bold; font-size: 1.2rem; }
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; border: 2px solid #0f0; border-radius: 50%; transform: translate(-50%, -50%); display: none; pointer-events: none; z-index: 5; }
+        /* FIRE BUTTON (ΔΙΑΦΑΝΟ ΜΕ ΣΦΑΙΡΑ) */
+        #fire-btn {
+            position: absolute; bottom: 40px; right: 40px; width: 100px; height: 100px;
+            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; z-index: 100; display: none; align-items: center; justify-content: center;
+            font-size: 2rem; opacity: 0.7;
+        }
+
+        /* EXTRA BUTTONS */
+        #extra-btns {
+            position: absolute; bottom: 40px; right: 160px; display: none; flex-direction: column; gap: 10px; z-index: 100;
+        }
+        .small-btn { width: 60px; height: 45px; background: rgba(0,0,0,0.6); border: 1px solid #fff; color: white; border-radius: 5px; font-size: 0.7rem; }
+
+        #hud { position: absolute; top: 15px; left: 15px; z-index: 50; display: none; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; border-left: 4px solid #f1c40f; }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; border: 2px solid #0f0; border-radius: 50%; transform: translate(-50%, -50%); display: none; pointer-events: none; }
     </style>
 </head>
 <body>
 
+<div id="rotate-notice">
+    <h2>🔄 ΠΑΡΑΚΑΛΩ ΓΥΡΙΣΤΕ ΤΗΝ ΟΘΟΝΗ ΠΛΑΓΙΑ</h2>
+    <p>Για να ξεκινήσει η μάχη, η οθόνη πρέπει να είναι σε Landscape mode.</p>
+</div>
+
 <div id="start-screen">
-    <h1>BATTLEFRONT 1944</h1>
-    <button class="play-btn" onclick="showLoadout()">BATTLE</button>
+    <h1 style="font-size: 4rem; text-shadow: 4px 4px #000; color: #f1c40f;">BATTLEFRONT 1944</h1>
+    <button class="play-btn" onclick="requestGame()">BATTLE</button>
 </div>
 
-<div id="loadout-menu">
-    <h2>ΕΠΙΛΟΓΗ ΜΟΝΑΔΑΣ</h2>
-    <div class="loadout-card" onclick="startGame('SNIPER')">
-        <h3 style="color:#f1c40f">SNIPER UNIT</h3>
-        <p>Kar98k + Luger</p>
-    </div>
-    <div class="loadout-card" onclick="startGame('ASSAULT')">
-        <h3 style="color:#f1c40f">ASSAULT INFANTRY</h3>
-        <p>MP40 + Shotgun</p>
-    </div>
+<div id="hud">
+    HP: <span id="hp">100</span> | AMMO: <span id="ammo">30</span> | KILLS: <span id="kills">0</span>
 </div>
 
-<div id="ui">
-    <div>ΥΓΕΙΑ: <span id="hp">100</span>%</div>
-    <div>SCORE: <span id="kills">0</span> / 40</div>
+<div id="joy-base"><div id="joy-stick"></div></div>
+<div id="fire-btn">🌑</div>
+<div id="extra-btns">
+    <button class="small-btn" onclick="jump()">JUMP</button>
+    <button class="small-btn" onclick="toggleCrouch()">CROUCH</button>
+    <button class="small-btn" onclick="reload()">RELOAD</button>
 </div>
+
 <div id="crosshair"></div>
-
-<div id="mobile-controls">
-    <div></div><div class="m-btn" id="btn-w">↑</div><div></div>
-    <div class="m-btn" id="btn-a">←</div><div class="m-btn" id="btn-s">↓</div><div class="m-btn" id="btn-d">→</div>
-</div>
-<div id="attack-btn" onclick="fire()">FIRE</div>
 
 <script type="importmap">
     {
@@ -89,57 +100,136 @@ html lang="el">
     import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
     let scene, camera, renderer, controls;
-    let moveF = false, moveB = false, moveL = false, moveR = false;
-    let kills = 0;
+    let moveF = 0, moveR = 0, vY = 0;
+    let hp = 100, ammo = 30, kills = 0, isCrouching = false;
 
-    // Διόρθωση των functions για να είναι προσβάσιμες από τα κουμπιά
-    window.showLoadout = function() {
-        console.log("Button clicked");
+    window.requestGame = () => {
+        // Ζητάμε Fullscreen για καλύτερη εμπειρία
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        }
         document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('loadout-menu').style.display = 'flex';
-    }
-
-    window.startGame = function(type) {
-        document.getElementById('loadout-menu').style.display = 'none';
-        document.getElementById('ui').style.display = 'block';
+        document.getElementById('hud').style.display = 'block';
+        document.getElementById('joy-base').style.display = 'block';
+        document.getElementById('fire-btn').style.display = 'flex';
+        document.getElementById('extra-btns').style.display = 'flex';
         document.getElementById('crosshair').style.display = 'block';
-        document.getElementById('mobile-controls').style.display = 'grid';
-        document.getElementById('attack-btn').style.display = 'flex';
         init();
         animate();
-    }
+    };
 
     function init() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x3d443d);
-        scene.fog = new THREE.FogExp2(0x3d443d, 0.015);
+        scene.background = new THREE.Color(0x353c35);
+        scene.fog = new THREE.FogExp2(0x353c35, 0.02);
 
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
         controls = new PointerLockControls(camera, document.body);
 
-        // ΦΩΤΙΣΜΟΣ
-        const sun = new THREE.DirectionalLight(0xffffff, 1);
-        sun.position.set(50, 100, 50);
-        scene.add(sun);
-        scene.add(new THREE.AmbientLight(0x555555));
+        scene.add(new THREE.AmbientLight(0x888888));
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(10, 20, 10);
+        scene.add(light);
 
-        // ΠΙΣΤΑ
-        const floor = new THREE.Mesh(
-            new THREE.PlaneGeometry(1000, 1000),
-            new THREE.MeshStandardMaterial({ color: 0x2d3528 })
-        );
+        // GROUND & TUNNEL
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({color: 0x222b1a}));
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // ΔΗΜΙΟΥΡΓΙΑ ΣΤΡΑΤΙΩΤΩΝ (Υψηλή αντίθεση χρωμάτων)
+        // ENEMIES (NPCs)
         for(let i=0; i<15; i++) {
-            createSoldier(Math.random()*60-30, Math.random()*-100-20, 0x2e3b23); // ΣΥΜΜΑΧΟΙ (Dark Green)
-            createSoldier(Math.random()*60-30, Math.random()*100+20, 0x1a1a1a);  // ΑΞΟΝΑΣ (Black/Grey)
+            const enemy = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial({color: 0x111111}));
+            enemy.position.set(Math.random()*80-40, 1, Math.random()*-80-20);
+            scene.add(enemy);
         }
 
-    
+        camera.position.set(0, 1.7, 10);
+        setupJoystick();
+    }
+
+    function setupJoystick() {
+        const base = document.getElementById('joy-base');
+        const stick = document.getElementById('joy-stick');
+        
+        base.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const rect = base.getBoundingClientRect();
+            const centerX = rect.left + 65;
+            const centerY = rect.top + 65;
+            const dx = touch.clientX - centerX;
+            const dy = touch.clientY - centerY;
+            const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 45);
+            const angle = Math.atan2(dy, dx);
+            
+            stick.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+            moveF = -Math.sin(angle) * (dist/45);
+            moveR = Math.cos(angle) * (dist/45);
+        });
+
+        base.addEventListener('touchend', () => {
+            stick.style.transform = `translate(0px, 0px)`;
+            moveF = 0; moveR = 0;
+        });
+
+        // ACTIONS
+        document.getElementById('fire-btn').onclick = () => {
+            if(ammo > 0) {
+                ammo--;
+                document.getElementById('ammo').innerText = ammo;
+                camera.rotation.x += 0.05; // Recoil
+                setTimeout(() => camera.rotation.x -= 0.05, 50);
+                kills++;
+                document.getElementById('kills').innerText = kills;
+            }
+        };
+
+        window.jump = () => { if(camera.position.y <= 1.8) vY = 0.2; };
+        window.toggleCrouch = () => {
+            isCrouching = !isCrouching;
+            camera.position.y = isCrouching ? 0.9 : 1.7;
+        };
+        window.reload = () => {
+            ammo = 30;
+            document.getElementById('ammo').innerText = ammo;
+        };
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const speed = 0.3;
+        controls.moveForward(moveF * speed);
+        controls.moveRight(moveR * speed);
+
+        // PHYSICS
+        if(vY !== 0 || camera.position.y > 1.7) {
+            camera.position.y += vY;
+            vY -= 0.01;
+            if(camera.position.y <= 1.7 && !isCrouching) {
+                camera.position.y = 1.7;
+                vY = 0;
+            }
+        }
+        renderer.render(scene, camera);
+    }
+
+    // LOOK SENSITIVITY
+    let lx, ly;
+    document.addEventListener('touchstart', e => { 
+        if(e.touches[0].clientX > window.innerWidth/2) {
+            lx = e.touches[0].pageX; ly = e.touches[0].pageY; 
+        }
+    });
+    document.addEventListener('touchmove', e => {
+        if(e.touches[0].clientX > window.innerWidth/2) {
+            camera.rotation.y -= (e.touches[0].pageX - lx) * 0.005;
+            camera.rotation.x -= (e.touches[0].pageY - ly) * 0.005;
+            lx = e.touches[0].pageX; ly = e.touches[0].pageY;
+        }
+    });
+</script>
+</body>
+</html>
