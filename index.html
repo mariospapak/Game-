@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>WW2 Battle Site</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #ui { position: absolute; top: 10px; left: 10px; color: white; font-family: sans-serif; pointer-events: none; }
+        #loadout-menu { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8); padding: 20px; text-align: center; color: white; border: 2px solid #555;
+        }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; background: #444; color: white; border: none; }
+        button:hover { background: #666; }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border: 1px solid lime; transform: translate(-50%, -50%); pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loadout-menu">
+        <h2>ΕΠΙΛΟΓΗ LOADOUT</h2>
+        <button onclick="startGame('Sniper')">Sniper + Pistol</button>
+        <button onclick="startGame('Assault')">Rifle + Shotgun</button>
+    </div>
+
+    <div id="ui" style="display:none;">
+        <div>HP: <span id="hp">100</span> | VEST: <span id="vest">0</span></div>
+        <div>KILLS: <span id="kills">0</span> / 40</div>
+        <div id="weapon-info">Όπλο: -</div>
+    </div>
+    <div id="crosshair"></div>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+        import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/PointerLockControls.js';
+
+        let scene, camera, renderer, controls;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+
+        window.startGame = function(type) {
+            document.getElementById('loadout-menu').style.display = 'none';
+            document.getElementById('ui').style.display = 'block';
+            document.getElementById('weapon-info').innerText = "Loadout: " + type;
+            init();
+            animate();
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x334433); // Χρώμα πολέμου
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new PointerLockControls(camera, document.body);
+            document.body.addEventListener('click', () => controls.lock());
+
+            // Έδαφος
+            const floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(200, 200),
+                new THREE.MeshPhongMaterial({ color: 0x222222 })
+            );
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Φως
+            const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+            scene.add(light);
+
+            // Έλεγχος κίνησης
+            const onKeyDown = (e) => {
+                if (e.code === 'KeyW') moveForward = true;
+                if (e.code === 'KeyS') moveBackward = true;
+                if (e.code === 'KeyA') moveLeft = true;
+                if (e.code === 'KeyD') moveRight = true;
+            };
+            const onKeyUp = (e) => {
+                if (e.code === 'KeyW') moveForward = false;
+                if (e.code === 'KeyS') moveBackward = false;
+                if (e.code === 'KeyA') moveLeft = false;
+                if (e.code === 'KeyD') moveRight = false;
+            };
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls && controls.isLocked) {
+                const delta = 0.15;
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+
+                if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+
+                controls.moveRight(-velocity.x * delta);
+                controls.moveForward(-velocity.z * delta);
+            }
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+  </html>
+  
