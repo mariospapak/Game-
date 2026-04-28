@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="el">
+html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -143,77 +142,4 @@
             createSoldier(Math.random()*60-30, Math.random()*100+20, 0x1a1a1a);  // ΑΞΟΝΑΣ (Black/Grey)
         }
 
-        // ΣΗΡΑΓΓΑ (ΤΟΥΝΕΛ)
-        const tunnelGeo = new THREE.CylinderGeometry(4, 4, 60, 12, 1, true);
-        const tunnelMat = new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.DoubleSide});
-        const tunnel = new THREE.Mesh(tunnelGeo, tunnelMat);
-        tunnel.rotation.z = Math.PI / 2;
-        scene.add(tunnel);
-
-        setupControls();
-        camera.position.set(0, 1.7, 10);
-    }
-
-    function createSoldier(x, z, color) {
-        const group = new THREE.Group();
-        // Body
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 0.4), new THREE.MeshStandardMaterial({color: color}));
-        body.position.y = 0.7;
-        // Helmet
-        const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), new THREE.MeshStandardMaterial({color: 0x333333}));
-        helmet.position.y = 1.5;
-        group.add(body, helmet);
-        group.position.set(x, 0, z);
-        scene.add(group);
-    }
-
-    function setupControls() {
-        document.addEventListener('keydown', e => {
-            if(e.code==='KeyW') moveF = true; if(e.code==='KeyS') moveB = true;
-            if(e.code==='KeyA') moveL = true; if(e.code==='KeyD') moveR = true;
-        });
-        document.addEventListener('keyup', e => {
-            if(e.code==='KeyW') moveF = false; if(e.code==='KeyS') moveB = false;
-            if(e.code==='KeyA') moveL = false; if(e.code==='KeyD') moveR = false;
-        });
-        
-        const bind = (id, fn) => {
-            const el = document.getElementById(id);
-            el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(true); });
-            el.addEventListener('touchend', (e) => { e.preventDefault(); fn(false); });
-        };
-        bind('btn-w', v => moveF = v); bind('btn-s', v => moveB = v);
-        bind('btn-a', v => moveL = v); bind('btn-d', v => moveR = v);
-    }
-
-    window.fire = function() {
-        // Kickback effect
-        camera.rotation.x += 0.03;
-        setTimeout(() => camera.rotation.x -= 0.03, 50);
-        kills++;
-        document.getElementById('kills').innerText = kills;
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-        const speed = 0.4;
-        if(moveF) controls.moveForward(speed);
-        if(moveB) controls.moveForward(-speed);
-        if(moveL) controls.moveRight(-speed);
-        if(moveR) controls.moveRight(speed);
-        renderer.render(scene, camera);
-    }
-
-    // Camera move for mobile
-    let lastX, lastY;
-    document.addEventListener('touchstart', e => { lastX = e.touches[0].pageX; lastY = e.touches[0].pageY; });
-    document.addEventListener('touchmove', e => {
-        let dx = e.touches[0].pageX - lastX;
-        let dy = e.touches[0].pageY - lastY;
-        camera.rotation.y -= dx * 0.003;
-        camera.rotation.x -= dy * 0.003;
-        lastX = e.touches[0].pageX; lastY = e.touches[0].pageY;
-    });
-</script>
-</body>
-</html>
+    
